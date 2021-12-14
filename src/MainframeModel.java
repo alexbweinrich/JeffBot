@@ -2,19 +2,21 @@ import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class MainframeModel {
 
-    private int currentJeffImageIndex = -1;
-
     private final ArrayList<String> jeffLocationArray;
     private final ArrayList<ImageIcon> jeffImageArray;
+    private final ArrayList<Boolean> jeffImageUsedTracker;
     private ArrayList<String> jeffQuoteArray;
     private final ArrayList<String> jeffQuoteArrayOrigin;
 
     public MainframeModel() {
         jeffLocationArray = new ArrayList<>();
         jeffImageArray = new ArrayList<>();
+        jeffImageUsedTracker = new ArrayList<>();
         jeffQuoteArray = new ArrayList<>();
         jeffQuoteArrayOrigin = new ArrayList<>();
         initiateJeffArrays();
@@ -30,6 +32,10 @@ public class MainframeModel {
 
         for (String filename : jeffLocationArray) {
             jeffImageArray.add(new ImageIcon(filename));
+        }
+
+        for (ImageIcon icon : jeffImageArray) {
+            jeffImageUsedTracker.add(Boolean.FALSE);
         }
 
         BufferedReader reader;
@@ -52,16 +58,21 @@ public class MainframeModel {
      * Pulls a random new Jeff Image from the Jeff Image array, such that it will cycle through all
      * Jeff images before reloading the same image twice.
      *
-     * @author Alex Weinrich
-     * @since 9/2/2020
+     * @author Marko Gidej
+     * @since 12/14/2021
      **/
     public ImageIcon getJeffImage() {
         int newInt;
+        boolean imageUsed;
         do {
             newInt = (int)(Math.random() * jeffImageArray.size());
-        } while (currentJeffImageIndex == newInt);
-        currentJeffImageIndex = newInt;
-        return jeffImageArray.get(currentJeffImageIndex);
+            imageUsed = jeffImageUsedTracker.get(newInt);
+        } while (imageUsed);
+        jeffImageUsedTracker.set(newInt, true);
+        if (!jeffImageUsedTracker.contains(false)) {
+            Collections.fill(jeffImageUsedTracker, false);
+        }
+        return jeffImageArray.get(newInt);
     }
 
     public String getJeffQuote() { //after cycling, it can hit the same quote
